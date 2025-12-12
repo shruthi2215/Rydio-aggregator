@@ -28,9 +28,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <!-- Google Maps SDK - Replace YOUR_API_KEY with your actual key -->
-  <!-- Note: In production, load API key from environment variable -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,directions,geometry&callback=initMap" async defer></script>
+  <!-- Google Maps SDK - Only load if API key is configured -->
+  <!-- To enable: Replace YOUR_API_KEY below with your actual Google Maps API key -->
+  <!-- Or set window.GOOGLE_MAPS_API_KEY before this script loads -->
+  <script>
+    // Check if API key is configured
+    const apiKey = window.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY';
+    if (apiKey && apiKey !== 'YOUR_API_KEY') {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,directions,geometry&callback=initMap`;
+      script.async = true;
+      script.defer = true;
+      script.onerror = () => {
+        console.warn('Google Maps failed to load. Using fallback mode.');
+        window.googleMapsError = true;
+      };
+      document.head.appendChild(script);
+    } else {
+      // No API key - use fallback mode
+      console.info('Google Maps API key not configured. Using fallback mode with mock data.');
+      window.googleMapsError = true;
+    }
+  </script>
 </head>
 <body>
   <!-- Skip to main content for accessibility -->
@@ -38,7 +57,8 @@
   <div class="page">
     <header class="top-bar">
       <div class="brand">
-        <img src="logo.svg" alt="RYDIO" class="brand-logo">
+        <img src="logo.png" alt="RYDIO Logo" class="brand-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+        <span class="brand-name" style="display: none;">RYDIO</span>
         <span class="tag">Compare · Book · Track</span>
       </div>
       <nav class="nav">

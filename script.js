@@ -76,52 +76,100 @@ const Storage = {
 // ============================================
 
 const MapService = {
-  apiKey: 'YOUR_API_KEY', // Replace with your Google Maps API key
+  apiKey: window.GOOGLE_MAPS_API_KEY || null,
   isLoaded: false,
+  hasError: false,
 
   init() {
-    if (typeof google !== 'undefined' && google.maps) {
-      this.isLoaded = true;
-      this.initializeMaps();
-      return true;
+    // Check if there was an error loading the script
+    if (window.googleMapsError) {
+      this.hasError = true;
+      this.showFallbackMessage();
+      return false;
     }
+
+    // Check if Google Maps is available
+    if (typeof google !== 'undefined' && google.maps) {
+      try {
+        this.isLoaded = true;
+        this.initializeMaps();
+        return true;
+      } catch (e) {
+        console.error('Error initializing Google Maps:', e);
+        this.hasError = true;
+        this.showFallbackMessage();
+        return false;
+      }
+    }
+    
+    // Maps not loaded yet, but no error - might still be loading
     return false;
   },
 
-  initializeMaps() {
-    // Initialize booking map
-    const bookingMapEl = document.getElementById('bookingMapContainer');
-    if (bookingMapEl && !appState.mapInstances.booking) {
-      appState.mapInstances.booking = new google.maps.Map(bookingMapEl, {
-        zoom: 13,
-        center: { lat: 12.9716, lng: 77.5946 }, // Bangalore coordinates
-        mapTypeId: 'roadmap',
-        disableDefaultUI: true,
-        zoomControl: true,
-        styles: this.getMapStyles()
-      });
-      appState.directionsServices.booking = new google.maps.DirectionsService();
-      appState.directionsRenderers.booking = new google.maps.DirectionsRenderer({
-        map: appState.mapInstances.booking,
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: '#0F0F0F',
-          strokeWeight: 6
-        }
-      });
-    }
+  showFallbackMessage() {
+    // Show a subtle message that maps are in fallback mode
+    const mapContainers = document.querySelectorAll('.map-container');
+    mapContainers.forEach(container => {
+      if (!container.querySelector('.map-fallback-message')) {
+        const message = document.createElement('div');
+        message.className = 'map-fallback-message';
+        message.innerHTML = '<p>Map view unavailable. Using demo data.</p>';
+        message.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 8px; font-size: 12px; z-index: 1000;';
+        container.appendChild(message);
+      }
+    });
+  },
 
-    // Initialize tracking map
-    const trackingMapEl = document.getElementById('trackingMapContainer');
-    if (trackingMapEl && !appState.mapInstances.tracking) {
-      appState.mapInstances.tracking = new google.maps.Map(trackingMapEl, {
-        zoom: 14,
-        center: { lat: 12.9716, lng: 77.5946 },
-        mapTypeId: 'roadmap',
-        disableDefaultUI: true,
-        zoomControl: true,
-        styles: this.getMapStyles()
-      });
+  initializeMaps() {
+    try {
+      // Initialize booking map
+      const bookingMapEl = document.getElementById('bookingMapContainer');
+      if (bookingMapEl && !appState.mapInstances.booking) {
+        try {
+          appState.mapInstances.booking = new google.maps.Map(bookingMapEl, {
+            zoom: 13,
+            center: { lat: 12.9716, lng: 77.5946 }, // Bangalore coordinates
+            mapTypeId: 'roadmap',
+            disableDefaultUI: true,
+            zoomControl: true,
+            styles: this.getMapStyles()
+          });
+          appState.directionsServices.booking = new google.maps.DirectionsService();
+          appState.directionsRenderers.booking = new google.maps.DirectionsRenderer({
+            map: appState.mapInstances.booking,
+            suppressMarkers: true,
+            polylineOptions: {
+              strokeColor: '#0F0F0F',
+              strokeWeight: 6
+            }
+          });
+        } catch (e) {
+          console.error('Error initializing booking map:', e);
+          this.showFallbackMessage();
+        }
+      }
+
+      // Initialize tracking map
+      const trackingMapEl = document.getElementById('trackingMapContainer');
+      if (trackingMapEl && !appState.mapInstances.tracking) {
+        try {
+          appState.mapInstances.tracking = new google.maps.Map(trackingMapEl, {
+            zoom: 14,
+            center: { lat: 12.9716, lng: 77.5946 },
+            mapTypeId: 'roadmap',
+            disableDefaultUI: true,
+            zoomControl: true,
+            styles: this.getMapStyles()
+          });
+        } catch (e) {
+          console.error('Error initializing tracking map:', e);
+          this.showFallbackMessage();
+        }
+      }
+    } catch (e) {
+      console.error('Error in initializeMaps:', e);
+      this.hasError = true;
+      this.showFallbackMessage();
     }
   },
 
@@ -703,14 +751,35 @@ document.addEventListener('DOMContentLoaded', () => {
   LocationManager.init();
 
   // Initialize Map SDK (if available)
-  if (typeof google !== 'undefined' && google.maps) {
+  // Check if Maps already loaded or if there was an error
+  if (window.googleMapsError) {
+    // Maps failed to load - use fallback mode
+    MapService.hasError = true;
+    MapService.showFallbackMessage();
+  } else if (typeof google !== 'undefined' && google.maps) {
+    // Maps already loaded
     MapService.init();
   } else {
     // Wait for Google Maps to load
     window.initMap = () => {
-      MapService.init();
-      LocationManager.updateRoutes();
+      try {
+        MapService.init();
+        LocationManager.updateRoutes();
+      } catch (e) {
+        console.error('Error in initMap callback:', e);
+        MapService.hasError = true;
+        MapService.showFallbackMessage();
+      }
     };
+    
+    // Timeout fallback - if Maps doesn't load within 10 seconds, use fallback
+    setTimeout(() => {
+      if (!MapService.isLoaded && typeof google === 'undefined') {
+        console.warn('Google Maps loading timeout. Using fallback mode.');
+        MapService.hasError = true;
+        MapService.showFallbackMessage();
+      }
+    }, 10000);
   }
 
   // Initialize driver pin animations
