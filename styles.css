@@ -1,13 +1,14 @@
 :root {
-  --blue: #217cff;
-  --black: #0f0f0f;
-  --green: #38a169;
-  --yellow: #f4b400;
+  /* Modern palette */
+  --blue: #2563eb;
+  --black: #0f172a;
+  --green: #22c55e;
+  --yellow: #fbbf24;
   --white: #ffffff;
-  --gray: #e8e8e8;
-  --muted: #5c6070;
+  --gray: #e4e8f0;
+  --muted: #5b6478;
   --radius: 18px;
-  --shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  --shadow: 0 12px 45px rgba(15, 23, 42, 0.12);
 }
 
 *,
@@ -19,9 +20,10 @@
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at 15% 20%, rgba(33, 124, 255, 0.08), transparent 28%),
-    radial-gradient(circle at 80% 0%, rgba(244, 180, 0, 0.06), transparent 30%),
-    #f7f9fc;
+  background:
+    radial-gradient(1200px at 20% 10%, rgba(37, 99, 235, 0.12), transparent 50%),
+    radial-gradient(900px at 80% 0%, rgba(124, 58, 237, 0.10), transparent 46%),
+    linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
   color: var(--black);
   min-height: 100vh;
 }
@@ -54,12 +56,11 @@ body {
   letter-spacing: 0.02em;
 }
 
-.brand-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--blue);
-  box-shadow: 0 0 0 8px rgba(33, 124, 255, 0.16);
+.brand-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .tag {
