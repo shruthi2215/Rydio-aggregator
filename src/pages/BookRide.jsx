@@ -9,9 +9,10 @@ import { Shield, AlertTriangle, Navigation } from "lucide-react";
 import { formatDistance, formatDuration } from "../utils/maps";
 
 const BookRide = () => {
-  const { routes, selectedRouteId, selectRoute, pickup, drop, rideType, setSurge } = useRideStore();
+  const { routes, selectedRouteId, selectRoute, pickup, drop, rideType, setSurge, fareForSelection } = useRideStore();
   const { openSheet } = useUIStore();
   const currentRoute = routes.find((r) => r.id === selectedRouteId) || routes[0];
+  const fare = fareForSelection();
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -41,6 +42,42 @@ const BookRide = () => {
             pickup={pickup}
             drop={drop}
           />
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="card flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-slate-200"
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className="h-3 w-10 rounded-full"
+                style={{ background: currentRoute?.color }}
+                aria-hidden
+              />
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Selected route</p>
+                <p className="text-base font-semibold text-white">{currentRoute?.label}</p>
+                <p className="text-xs text-slate-400">Tap any colored path on the map to switch</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="rounded-2xl bg-white/5 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Fare</p>
+                <p className="text-sm font-semibold text-white">₹{fare.total}</p>
+              </div>
+              <div className="rounded-2xl bg-white/5 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Distance</p>
+                <p className="text-sm font-semibold text-white">{formatDistance(currentRoute.distanceKm)}</p>
+              </div>
+              <div className="rounded-2xl bg-white/5 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">ETA</p>
+                <p className="text-sm font-semibold text-white">{formatDuration(currentRoute.durationMin)}</p>
+              </div>
+              <div className="rounded-2xl bg-white/5 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Surge</p>
+                <p className="text-sm font-semibold text-white">x{fare.total / fare.fare > 1 ? (fare.total / fare.fare).toFixed(1) : "1.0"}</p>
+              </div>
+            </div>
+          </motion.div>
           <RideOptions />
         </div>
 
