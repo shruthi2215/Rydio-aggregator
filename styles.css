@@ -142,10 +142,15 @@ body {
 }
 
 .brand-logo {
-  height: 40px;
+  height: 45px;
   width: auto;
   object-fit: contain;
   display: block;
+  margin-right: 8px;
+}
+
+.brand-name {
+  display: none; /* Hidden since logo contains text */
 }
 
 .tag {
