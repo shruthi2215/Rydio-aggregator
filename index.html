@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RYDIO – Multi-network Ride Aggregator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <span class="brand-name">RYDIO</span>
+        <span class="tag">Compare · Book · Track</span>
+      </div>
+      <nav class="nav">
+        <a href="#landing">Home</a>
+        <a href="#user-auth">User</a>
+        <a href="#captain-auth">Captain</a>
+        <a href="#booking">Booking</a>
+        <a href="#captain-dashboard">Captain</a>
+      </nav>
+      <div class="mode-toggle">
+        <label class="toggle">
+          <input type="checkbox" id="wireframeToggle" aria-label="Toggle wireframe view">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Wireframe</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="section hero" id="landing">
+        <div class="hero-copy">
+          <p class="eyebrow">One tap · All networks</p>
+          <h1>Compare Uber, Ola, and Rapido — book the best ride in seconds.</h1>
+          <p class="lede">RYDIO shows live routes in three colors, real-time ETAs, and lets users and captains connect faster. Built for launch-ready demos and investor pitches.</p>
+          <div class="cta-row">
+            <button class="btn primary">Start Booking</button>
+            <button class="btn ghost">View Captain Mode</button>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Electric Blue UI</span>
+            <span class="pill">Glass cards</span>
+            <span class="pill">Responsive</span>
+          </div>
+        </div>
+        <div class="hero-visual card glass shadow">
+          <div class="stat-block">
+            <p class="label">Live Networks</p>
+            <h3>Uber · Ola · Rapido</h3>
+            <p class="muted">Auto route coloring</p>
+          </div>
+          <div class="map preview">
+            <div class="route route-uber" data-provider="Uber" data-price="$9.20" data-eta="6 min"></div>
+            <div class="route route-ola" data-provider="Ola" data-price="$8.70" data-eta="7 min"></div>
+            <div class="route route-rapido" data-provider="Rapido" data-price="$6.40" data-eta="9 min"></div>
+          </div>
+          <div class="stat-grid">
+            <div>
+              <p class="label">Avg ETA</p>
+              <h3>6.5 min</h3>
+            </div>
+            <div>
+              <p class="label">Best price</p>
+              <h3>$6.40</h3>
+            </div>
+            <div>
+              <p class="label">Coverage</p>
+              <h3>120+ cities</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section auth" id="user-auth">
+        <div class="section-header">
+          <div>
+            <p class="label">User Access</p>
+            <h2>User Login / Register</h2>
+            <p class="muted">Simple entry for ride bookers.</p>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass">
+            <h3>Login</h3>
+            <div class="form-col">
+              <input placeholder="Email or phone">
+              <input placeholder="Password" type="password">
+              <button class="btn primary">Login</button>
+            </div>
+          </div>
+          <div class="card shadow glass">
+            <h3>Register</h3>
+            <div class="form-col">
+              <input placeholder="Full name">
+              <input placeholder="Email">
+              <input placeholder="Mobile number">
+              <button class="btn ghost">Create Account</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section auth" id="captain-auth">
+        <div class="section-header">
+          <div>
+            <p class="label">Captain Access</p>
+            <h2>Captain Login / Register</h2>
+            <p class="muted">For drivers to accept multi-network rides.</p>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass">
+            <h3>Login</h3>
+            <div class="form-col">
+              <input placeholder="Phone">
+              <input placeholder="OTP" value="1234">
+              <button class="btn primary">Login as Captain</button>
+            </div>
+          </div>
+          <div class="card shadow glass">
+            <h3>Register</h3>
+            <div class="form-col">
+              <input placeholder="Full name">
+              <input placeholder="Vehicle number">
+              <input placeholder="License ID">
+              <button class="btn ghost">Sign Up</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section booking" id="booking">
+        <div class="section-header">
+          <div>
+            <p class="label">User Ride Booking</p>
+            <h2>Map + Route Colors</h2>
+            <p class="muted">Three colored segments for Uber (Black), Ola (Green), Rapido (Yellow). Click to see ETA + price.</p>
+          </div>
+          <div class="chip-row">
+            <span class="chip chip-uber">Uber = Black</span>
+            <span class="chip chip-ola">Ola = Green</span>
+            <span class="chip chip-rapido">Rapido = Yellow</span>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass map-card">
+            <div class="inputs">
+              <input class="pill-input" value="Pickup: Auto-detected · MG Road" aria-label="Pickup">
+              <input class="pill-input" value="Destination: Airport T3" aria-label="Destination">
+            </div>
+            <div class="map large">
+              <div class="pin pickup">Pickup</div>
+              <div class="pin drop">T3</div>
+              <div class="route route-uber clickable" data-provider="Uber" data-price="$9.20" data-eta="6 min"></div>
+              <div class="route route-ola clickable" data-provider="Ola" data-price="$8.70" data-eta="7 min"></div>
+              <div class="route route-rapido clickable" data-provider="Rapido" data-price="$6.40" data-eta="9 min"></div>
+            </div>
+            <p class="muted">Tap each colored path to view pricing + ETA. Route is intentionally segmented to mirror multi-network comparison.</p>
+          </div>
+          <div class="card shadow glass bottom-sheet" id="bottomSheet">
+            <p class="label">Selected Service</p>
+            <h3 id="bs-provider">Uber</h3>
+            <div class="option-row">
+              <span class="chip">Bike</span>
+              <span class="chip active">Auto</span>
+              <span class="chip">Car</span>
+            </div>
+            <div class="metrics">
+              <div><p class="label">Price</p><h4 id="bs-price">$9.20</h4></div>
+              <div><p class="label">ETA</p><h4 id="bs-eta">6 min</h4></div>
+              <div><p class="label">Driver rating</p><h4>4.8 ★</h4></div>
+            </div>
+            <button class="btn primary full">BOOK RIDE</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section comparison" id="comparison">
+        <div class="section-header">
+          <div>
+            <p class="label">Price Comparison Panel</p>
+            <h2>Sortable fares & ETAs</h2>
+          </div>
+          <div class="chip-row sort-row">
+            <span class="chip active" data-sort="price">Lowest Price</span>
+            <span class="chip" data-sort="eta">Fastest Arrival</span>
+            <span class="chip" data-sort="rating">Best Rated</span>
+          </div>
+        </div>
+        <div class="card shadow glass table">
+          <div class="table-head">
+            <span>Uber</span>
+            <span>Ola</span>
+            <span>Rapido</span>
+          </div>
+          <div class="table-row">
+            <span>$9.20 · 6 min · Car · 4.8★</span>
+            <span>$8.70 · 7 min · Car · 4.6★</span>
+            <span>$6.40 · 9 min · Bike · 4.7★</span>
+          </div>
+          <div class="table-row">
+            <span>$5.80 · 5 min · Auto · 4.5★</span>
+            <span>$6.10 · 6 min · Auto · 4.4★</span>
+            <span>$4.90 · 8 min · Bike · 4.6★</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section confirm" id="confirmation">
+        <div class="section-header">
+          <div>
+            <p class="label">Ride Confirmation</p>
+            <h2>Review & lock</h2>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass">
+            <p class="label">Selected</p>
+            <h3>Rapido Bike</h3>
+            <p class="muted">Driver ETA: <strong>4:32</strong> remaining</p>
+            <div class="pill-row tight">
+              <span class="pill">Pickup: MG Road</span>
+              <span class="pill">Destination: Airport T3</span>
+            </div>
+            <button class="btn primary full">Confirm Booking</button>
+          </div>
+          <div class="card shadow glass">
+            <h4>Preview</h4>
+            <div class="map small">
+              <div class="route route-rapido"></div>
+              <div class="pin pickup">You</div>
+              <div class="pin drop">T3</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section live" id="live-tracking">
+        <div class="section-header">
+          <div>
+            <p class="label">Live Ride Tracking</p>
+            <h2>Real-time captain movement</h2>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass">
+            <div class="map medium">
+              <div class="route route-rapido"></div>
+              <div class="pin pickup">You</div>
+              <div class="pin driver">Captain</div>
+            </div>
+            <p class="muted">ETA updates every 10s. Map pins animate in real product.</p>
+          </div>
+          <div class="card shadow glass driver-card">
+            <h3>Driver</h3>
+            <p class="label">Name</p>
+            <p>Ravi Sharma · 4.8★</p>
+            <p class="label">Vehicle</p>
+            <p>Rapido Bike · KA 09 AB 1234</p>
+            <p class="label">Contact</p>
+            <p>+91 90000 12345</p>
+            <p class="label">OTP</p>
+            <div class="otp">4829</div>
+            <div class="btn-row">
+              <button class="btn ghost">Cancel Ride</button>
+              <button class="btn primary">Share Trip</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section captain" id="captain-dashboard">
+        <div class="section-header">
+          <div>
+            <p class="label">Captain Dashboard</p>
+            <h2>Multi-network requests</h2>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked>
+            <span></span>
+          </label>
+          <span class="muted">Online</span>
+        </div>
+        <div class="cards-row three">
+          <div class="card shadow glass request">
+            <p class="label">Uber request</p>
+            <h3>Pickup: MG Road</h3>
+            <p class="muted">Distance: 1.2 km · Offer: $5.80</p>
+            <p class="pill">ETA to user: 5 min</p>
+            <div class="btn-row">
+              <button class="btn ghost">Reject</button>
+              <button class="btn primary">Accept Ride</button>
+            </div>
+          </div>
+          <div class="card shadow glass request">
+            <p class="label">Ola request</p>
+            <h3>Pickup: Tech Park</h3>
+            <p class="muted">Distance: 2.0 km · Offer: $6.10</p>
+            <p class="pill">ETA to user: 6 min</p>
+            <div class="btn-row">
+              <button class="btn ghost">Reject</button>
+              <button class="btn primary">Accept Ride</button>
+            </div>
+          </div>
+          <div class="card shadow glass request">
+            <p class="label">Rapido request</p>
+            <h3>Pickup: City Mall</h3>
+            <p class="muted">Distance: 1.5 km · Offer: $4.90</p>
+            <p class="pill">ETA to user: 4 min</p>
+            <div class="btn-row">
+              <button class="btn ghost">Reject</button>
+              <button class="btn primary">Accept Ride</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section captain-accept" id="captain-acceptance">
+        <div class="section-header">
+          <div>
+            <p class="label">Captain Ride Acceptance</p>
+            <h2>Route to user + OTP</h2>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass map medium">
+            <div class="route route-uber"></div>
+            <div class="pin pickup">User</div>
+            <div class="pin driver">You</div>
+          </div>
+          <div class="card shadow glass">
+            <p class="label">Platform</p>
+            <h3>Uber · Auto</h3>
+            <p class="label">User OTP</p>
+            <div class="otp">7931</div>
+            <div class="btn-row">
+              <button class="btn ghost">Navigate</button>
+              <button class="btn primary">Ride Started</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section captain-nav" id="captain-nav">
+        <div class="section-header">
+          <div>
+            <p class="label">Captain Live Navigation</p>
+            <h2>In-ride guidance</h2>
+          </div>
+        </div>
+        <div class="grid two">
+          <div class="card shadow glass map large">
+            <div class="route route-ola"></div>
+            <div class="pin pickup">User</div>
+            <div class="pin drop">Drop</div>
+            <div class="pin driver">You</div>
+          </div>
+          <div class="card shadow glass">
+            <p class="label">Current</p>
+            <h3>ETA to drop: 9 min</h3>
+            <p class="muted">Turn-by-turn in production app.</p>
+            <div class="btn-row">
+              <button class="btn ghost">Pause</button>
+              <button class="btn primary">Contact User</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section summary" id="ride-end">
+        <div class="section-header">
+          <div>
+            <p class="label">Ride Completion</p>
+            <h2>Fare & earnings</h2>
+          </div>
+        </div>
+        <div class="card shadow glass">
+          <div class="metrics">
+            <div><p class="label">Fare</p><h3>$12.40</h3></div>
+            <div><p class="label">Platform charge</p><h3>$2.10</h3></div>
+            <div><p class="label">Driver earnings</p><h3>$10.30</h3></div>
+          </div>
+          <button class="btn primary full">End Ride</button>
+        </div>
+      </section>
+
+      <section class="section profiles" id="profiles">
+        <div class="grid two">
+          <div class="card shadow glass">
+            <h3>User Profile & Settings</h3>
+            <p class="label">Name</p><p>Aarav Mehta</p>
+            <p class="label">Payment</p><p>**** 4321 · UPI</p>
+            <div class="setting-row">
+              <span>Notifications</span>
+              <label class="switch"><input type="checkbox" checked><span></span></label>
+            </div>
+            <div class="setting-row">
+              <span>Emergency contacts</span>
+              <button class="btn ghost">Manage</button>
+            </div>
+          </div>
+          <div class="card shadow glass">
+            <h3>Captain Profile & Settings</h3>
+            <p class="label">Name</p><p>Ravi Sharma</p>
+            <p class="label">Vehicle</p><p>KA 09 AB 1234 · Bike</p>
+            <div class="setting-row">
+              <span>Online status</span>
+              <label class="switch"><input type="checkbox" checked><span></span></label>
+            </div>
+            <div class="setting-row">
+              <span>Payout preference</span>
+              <button class="btn ghost">Update</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>RYDIO — Three networks, one map.</p>
+        <div class="chip-row">
+          <span class="chip">Electric Blue #217CFF</span>
+          <span class="chip">Black #0F0F0F</span>
+          <span class="chip">Green #38A169</span>
+          <span class="chip">Yellow #F4B400</span>
+          <span class="chip">Grey #E8E8E8</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
