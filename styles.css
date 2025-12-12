@@ -190,62 +190,11 @@ body {
 
 .brand-drop {
   font-size: 28px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 4px;
-  animation: drop-bounce 2s ease-in-out infinite;
-  filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
-}
-
-@keyframes drop-bounce {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-3px) scale(1.1);
-  }
-}
-
-.brand-initial {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--primary);
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
-  border: 2px solid var(--primary);
-  margin-right: 8px;
-  animation: pulse-glow 2s ease-in-out infinite;
-  transition: all 0.3s ease;
-}
-
-.brand-initial:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
-    transform: scale(1.05);
-  }
-}
-
-.brand-logo {
-  height: 45px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-  margin-right: 10px;
 }
 
 .brand-name {
