@@ -182,10 +182,29 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.01em;
+}
+
+.brand-drop {
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  animation: drop-bounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+}
+
+@keyframes drop-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.1);
+  }
 }
 
 .brand-initial {
@@ -200,7 +219,7 @@ body {
   border-radius: 12px;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
   border: 2px solid var(--primary);
-  margin-right: 12px;
+  margin-right: 8px;
   animation: pulse-glow 2s ease-in-out infinite;
   transition: all 0.3s ease;
 }
