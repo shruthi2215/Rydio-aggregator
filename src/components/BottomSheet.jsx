@@ -6,11 +6,15 @@ import { formatDistance, formatDuration } from "../utils/maps";
 
 const BottomSheet = () => {
   const checklistItems = ["Helmet / Seatbelt ready", "Share trip with trusted contact", "OTP verification on pickup"];
-  const { isSheetOpen, closeSheet, safetyChecklist = [], toggleSafetyItem } = useUIStore();
+  const { isSheetOpen, closeSheet, safetyChecklist, toggleSafetyItem } = useUIStore();
   const { routes, selectedRouteId, rideType, fareForSelection } = useRideStore();
   const currentRoute = routes.find((r) => r.id === selectedRouteId) || routes[0];
   const fare = fareForSelection();
-  const allChecked = checklistItems.every((_, idx) => safetyChecklist[idx]);
+  // Ensure safetyChecklist is always an array with 3 items
+  const safeChecklist = Array.isArray(safetyChecklist) && safetyChecklist.length === 3 
+    ? safetyChecklist 
+    : [false, false, false];
+  const allChecked = checklistItems.every((_, idx) => safeChecklist[idx]);
 
   return (
     <AnimatePresence>
@@ -68,7 +72,7 @@ const BottomSheet = () => {
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-white/20 bg-slate-800 text-primary focus:ring-primary"
-                      checked={!!safetyChecklist[idx]}
+                      checked={!!safeChecklist[idx]}
                       onChange={(e) => toggleSafetyItem(idx, e.target.checked)}
                     />
                     {item}

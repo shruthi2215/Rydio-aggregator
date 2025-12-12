@@ -10,9 +10,10 @@ const useUIStore = create((set) => ({
   closeSheet: () => set({ isSheetOpen: false }),
   toggleSafetyItem: (index, value) =>
     set((state) => {
-      if (index < 0 || index >= state.safetyChecklist.length) return {};
-      const next = [...state.safetyChecklist];
-      next[index] = value ?? !next[index];
+      const current = state.safetyChecklist || [false, false, false];
+      if (index < 0 || index >= current.length) return state;
+      const next = [...current];
+      next[index] = value !== undefined ? value : !next[index];
       return { safetyChecklist: next };
     }),
   resetSafetyChecklist: () => set({ safetyChecklist: [false, false, false] }),
