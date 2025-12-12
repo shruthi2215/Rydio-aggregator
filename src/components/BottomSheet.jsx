@@ -68,12 +68,15 @@ const BottomSheet = () => {
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-200 md:grid-cols-3">
                 {checklistItems.map((item, idx) => (
-                  <label key={item} className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                  <label key={`safety-check-${idx}`} className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-white/20 bg-slate-800 text-primary focus:ring-primary"
                       checked={!!safeChecklist[idx]}
-                      onChange={(e) => toggleSafetyItem(idx, e.target.checked)}
+                      onChange={(e) => {
+                        // Each checkbox independently toggles its own index in the array
+                        toggleSafetyItem(idx, e.target.checked);
+                      }}
                     />
                     {item}
                   </label>
