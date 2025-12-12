@@ -194,7 +194,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 4px;
+  margin-right: 6px;
+  animation: rotate-right-twice 1.2s ease-in-out 1;
+  animation-iteration-count: 2;
+}
+
+@keyframes rotate-right-twice {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .brand-name {
