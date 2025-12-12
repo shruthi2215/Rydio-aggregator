@@ -5,10 +5,12 @@ import useUIStore from "../store/useUIStore";
 import { formatDistance, formatDuration } from "../utils/maps";
 
 const BottomSheet = () => {
-  const { isSheetOpen, closeSheet, safetyChecked, setSafetyChecked } = useUIStore();
+  const checklistItems = ["Helmet / Seatbelt ready", "Share trip with trusted contact", "OTP verification on pickup"];
+  const { isSheetOpen, closeSheet, safetyChecklist = [], toggleSafetyItem } = useUIStore();
   const { routes, selectedRouteId, rideType, fareForSelection } = useRideStore();
   const currentRoute = routes.find((r) => r.id === selectedRouteId) || routes[0];
   const fare = fareForSelection();
+  const allChecked = checklistItems.every((_, idx) => safetyChecklist[idx]);
 
   return (
     <AnimatePresence>
@@ -61,19 +63,19 @@ const BottomSheet = () => {
                 Safety checklist
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-200 md:grid-cols-3">
-                {["Helmet / Seatbelt ready", "Share trip with trusted contact", "OTP verification on pickup"].map((item) => (
+                {checklistItems.map((item, idx) => (
                   <label key={item} className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-white/20 bg-slate-800 text-primary focus:ring-primary"
-                      checked={safetyChecked}
-                      onChange={(e) => setSafetyChecked(e.target.checked)}
+                      checked={!!safetyChecklist[idx]}
+                      onChange={(e) => toggleSafetyItem(idx, e.target.checked)}
                     />
                     {item}
                   </label>
                 ))}
               </div>
-              {!safetyChecked && (
+              {!allChecked && (
                 <p className="mt-2 flex items-center gap-2 text-xs text-amber-300">
                   <AlertTriangle size={14} />
                   Please acknowledge safety before confirming.
@@ -86,7 +88,7 @@ const BottomSheet = () => {
                 Close
               </button>
               <button
-                disabled={!safetyChecked}
+                disabled={!allChecked}
                 className="btn-primary flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <CheckCircle2 size={16} />
