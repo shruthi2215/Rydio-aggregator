@@ -24,35 +24,50 @@ const appState = {
 
 const Storage = {
   save() {
-    const stateToSave = {
-      selectedProvider: appState.selectedProvider,
-      selectedVehicle: appState.selectedVehicle,
-      userAuth: appState.userAuth,
-      captainAuth: appState.captainAuth,
-      pickupLocation: appState.pickupLocation,
-      destination: appState.destination,
-      darkTheme: appState.darkTheme,
-      wireframe: appState.wireframe
-    };
-    localStorage.setItem('rydio_state', JSON.stringify(stateToSave));
+    try {
+      const stateToSave = {
+        selectedProvider: appState.selectedProvider,
+        selectedVehicle: appState.selectedVehicle,
+        userAuth: appState.userAuth,
+        captainAuth: appState.captainAuth,
+        pickupLocation: appState.pickupLocation,
+        destination: appState.destination,
+        darkTheme: appState.darkTheme,
+        wireframe: appState.wireframe
+      };
+      localStorage.setItem('rydio_state', JSON.stringify(stateToSave));
+    } catch (e) {
+      console.error('Failed to save state:', e);
+      // Handle quota exceeded error
+      if (e.name === 'QuotaExceededError') {
+        console.warn('LocalStorage quota exceeded. Clearing old data...');
+        this.clear();
+      }
+    }
   },
 
   load() {
-    const saved = localStorage.getItem('rydio_state');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('rydio_state');
+      if (saved) {
         const state = JSON.parse(saved);
         Object.assign(appState, state);
         return true;
-      } catch (e) {
-        console.error('Failed to load state:', e);
       }
+    } catch (e) {
+      console.error('Failed to load state:', e);
+      // Clear corrupted data
+      this.clear();
     }
     return false;
   },
 
   clear() {
-    localStorage.removeItem('rydio_state');
+    try {
+      localStorage.removeItem('rydio_state');
+    } catch (e) {
+      console.error('Failed to clear storage:', e);
+    }
   }
 };
 
@@ -327,57 +342,191 @@ const ThemeManager = {
 // Form Persistence
 // ============================================
 
+// ============================================
+// Input Validation Utilities
+// ============================================
+
+const Validator = {
+  email(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  },
+
+  phone(phone) {
+    const re = /^[0-9]{10}$/;
+    return re.test(phone.replace(/\D/g, ''));
+  },
+
+  otp(otp) {
+    const re = /^[0-9]{4}$/;
+    return re.test(otp);
+  },
+
+  showError(input, message) {
+    input.setCustomValidity(message);
+    input.reportValidity();
+  },
+
+  clearError(input) {
+    input.setCustomValidity('');
+  }
+};
+
+// ============================================
+// Debounce Utility
+// ============================================
+
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+// ============================================
+// Form Persistence
+// ============================================
+
 const FormManager = {
   init() {
-    // User login/register
-    this.setupForm('userLoginEmail', 'userLoginPassword', 'userLoginBtn', 'user');
-    this.setupForm('userRegisterName', 'userRegisterEmail', 'userRegisterPhone', 'userRegisterBtn', 'user');
-
-    // Captain login/register
-    this.setupForm('captainLoginPhone', 'captainLoginOTP', 'captainLoginBtn', 'captain');
-    this.setupForm('captainRegisterName', 'captainRegisterVehicle', 'captainRegisterLicense', 'captainRegisterBtn', 'captain');
-
-    // Load saved form data
+    // Setup form handlers
+    this.setupFormHandlers();
     this.loadFormData();
   },
 
-  setupForm(...fields) {
-    const buttonId = fields[fields.length - 1];
-    const button = document.getElementById(buttonId);
-    if (button) {
-      button.addEventListener('click', () => {
-        fields.slice(0, -1).forEach(fieldId => {
-          const field = document.getElementById(fieldId);
-          if (field && field.value) {
-            const key = `${fieldId}_value`;
-            localStorage.setItem(key, field.value);
-          }
-        });
-        Storage.save();
+  setupFormHandlers() {
+    // User login form
+    const userLoginForm = document.getElementById('userLoginForm');
+    if (userLoginForm) {
+      userLoginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (this.validateForm(userLoginForm)) {
+          this.handleLogin('user', userLoginForm);
+        }
       });
     }
 
-    // Auto-save on input
-    fields.slice(0, -1).forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.addEventListener('input', () => {
-          if (field.value) {
-            localStorage.setItem(`${fieldId}_value`, field.value);
-          }
-        });
+    // User register form
+    const userRegisterForm = document.getElementById('userRegisterForm');
+    if (userRegisterForm) {
+      userRegisterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (this.validateForm(userRegisterForm)) {
+          this.handleRegister('user', userRegisterForm);
+        }
+      });
+    }
+
+    // Captain login form
+    const captainLoginForm = document.getElementById('captainLoginForm');
+    if (captainLoginForm) {
+      captainLoginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (this.validateForm(captainLoginForm)) {
+          this.handleLogin('captain', captainLoginForm);
+        }
+      });
+    }
+
+    // Captain register form
+    const captainRegisterForm = document.getElementById('captainRegisterForm');
+    if (captainRegisterForm) {
+      captainRegisterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (this.validateForm(captainRegisterForm)) {
+          this.handleRegister('captain', captainRegisterForm);
+        }
+      });
+    }
+
+    // Auto-save on input with debouncing
+    const debouncedSave = debounce((input) => {
+      try {
+        if (input.value) {
+          localStorage.setItem(`${input.id}_value`, input.value);
+        }
+      } catch (e) {
+        console.warn('Failed to save form data:', e);
       }
+    }, 500);
+
+    document.querySelectorAll('input[id]').forEach(input => {
+      input.addEventListener('input', () => {
+        Validator.clearError(input);
+        debouncedSave(input);
+      });
     });
   },
 
-  loadFormData() {
-    // Load all form fields
-    document.querySelectorAll('input[id]').forEach(input => {
-      const saved = localStorage.getItem(`${input.id}_value`);
-      if (saved) {
-        input.value = saved;
+  validateForm(form) {
+    let isValid = true;
+    const inputs = form.querySelectorAll('input[required]');
+
+    inputs.forEach(input => {
+      if (!input.value.trim()) {
+        Validator.showError(input, 'This field is required');
+        isValid = false;
+      } else if (input.type === 'email' && !Validator.email(input.value)) {
+        Validator.showError(input, 'Please enter a valid email address');
+        isValid = false;
+      } else if (input.type === 'tel' && !Validator.phone(input.value)) {
+        Validator.showError(input, 'Please enter a valid 10-digit phone number');
+        isValid = false;
+      } else if (input.id.includes('OTP') && !Validator.otp(input.value)) {
+        Validator.showError(input, 'Please enter a valid 4-digit OTP');
+        isValid = false;
+      } else {
+        Validator.clearError(input);
       }
     });
+
+    return isValid;
+  },
+
+  handleLogin(type, form) {
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+      appState[`${type}Auth`] = data;
+      Storage.save();
+      alert(`${type === 'user' ? 'User' : 'Captain'} login successful!`);
+    } catch (e) {
+      console.error('Login error:', e);
+      alert('Login failed. Please try again.');
+    }
+  },
+
+  handleRegister(type, form) {
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+      appState[`${type}Auth`] = data;
+      Storage.save();
+      alert(`${type === 'user' ? 'User' : 'Captain'} registration successful!`);
+    } catch (e) {
+      console.error('Registration error:', e);
+      alert('Registration failed. Please try again.');
+    }
+  },
+
+  loadFormData() {
+    try {
+      document.querySelectorAll('input[id]').forEach(input => {
+        const saved = localStorage.getItem(`${input.id}_value`);
+        if (saved) {
+          input.value = saved;
+        }
+      });
+    } catch (e) {
+      console.warn('Failed to load form data:', e);
+    }
   }
 };
 
@@ -451,7 +600,18 @@ const LocationManager = {
     const pickupInput = document.getElementById('pickupInput');
     const destinationInput = document.getElementById('destinationInput');
 
+    // Debounced update function
+    const debouncedUpdate = debounce(() => {
+      this.updateRoutes();
+    }, 1000);
+
     if (pickupInput) {
+      pickupInput.addEventListener('input', () => {
+        appState.pickupLocation = pickupInput.value;
+        Storage.save();
+        debouncedUpdate();
+      });
+      
       pickupInput.addEventListener('change', () => {
         appState.pickupLocation = pickupInput.value;
         Storage.save();
@@ -460,6 +620,12 @@ const LocationManager = {
     }
 
     if (destinationInput) {
+      destinationInput.addEventListener('input', () => {
+        appState.destination = destinationInput.value;
+        Storage.save();
+        debouncedUpdate();
+      });
+      
       destinationInput.addEventListener('change', () => {
         appState.destination = destinationInput.value;
         Storage.save();
@@ -477,18 +643,27 @@ const LocationManager = {
   },
 
   async updateRoutes() {
-    const pickup = appState.pickupLocation || 'MG Road, Bangalore';
-    const destination = appState.destination || 'Airport T3, Bangalore';
+    try {
+      const pickup = appState.pickupLocation || 'MG Road, Bangalore';
+      const destination = appState.destination || 'Airport T3, Bangalore';
 
-    const providers = await MapService.fetchETAs(pickup, destination);
-    MapService.updateRoutes(providers);
-    
-    // Update countdown if provider is selected
-    if (appState.selectedProvider) {
-      const selectedRoute = document.querySelector(`[data-provider="${appState.selectedProvider}"]`);
-      if (selectedRoute) {
-        ProviderManager.selectProvider(selectedRoute);
+      if (!pickup.trim() || !destination.trim()) {
+        console.warn('Pickup or destination is empty');
+        return;
       }
+
+      const providers = await MapService.fetchETAs(pickup, destination);
+      MapService.updateRoutes(providers);
+      
+      // Update countdown if provider is selected
+      if (appState.selectedProvider) {
+        const selectedRoute = document.querySelector(`[data-provider="${appState.selectedProvider}"]`);
+        if (selectedRoute) {
+          ProviderManager.selectProvider(selectedRoute);
+        }
+      }
+    } catch (e) {
+      console.error('Error updating routes:', e);
     }
   }
 };
@@ -561,11 +736,37 @@ document.addEventListener('DOMContentLoaded', () => {
   if (bookRideBtn) {
     bookRideBtn.addEventListener('click', () => {
       if (appState.selectedProvider) {
-        alert(`Booking ${appState.selectedProvider} ride...`);
-        Storage.save();
+        // In production, this would make an API call
+        bookRideBtn.disabled = true;
+        bookRideBtn.textContent = 'Booking...';
+        
+        setTimeout(() => {
+          alert(`Booking ${appState.selectedProvider} ride...`);
+          bookRideBtn.disabled = false;
+          bookRideBtn.textContent = 'BOOK RIDE';
+          Storage.save();
+        }, 1000);
       } else {
         alert('Please select a provider first');
       }
     });
   }
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    ETACountdown.stop();
+    DriverAnimation.stopAll();
+  });
+});
+
+// Error handling for unhandled errors
+window.addEventListener('error', (e) => {
+  console.error('Unhandled error:', e.error);
+  // In production, send to error tracking service
+});
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled promise rejection:', e.reason);
+  // In production, send to error tracking service
 });

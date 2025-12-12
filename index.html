@@ -29,9 +29,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <!-- Google Maps SDK - Replace YOUR_API_KEY with your actual key -->
+  <!-- Note: In production, load API key from environment variable -->
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,directions,geometry&callback=initMap" async defer></script>
 </head>
 <body>
+  <!-- Skip to main content for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <div class="page">
     <header class="top-bar">
       <div class="brand">
@@ -59,15 +62,15 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content">
       <section class="section hero" id="landing">
         <div class="hero-copy">
           <p class="eyebrow">One tap · All networks</p>
           <h1>Compare Uber, Ola, and Rapido — book the best ride in seconds.</h1>
           <p class="lede">RYDIO shows live routes in three colors, real-time ETAs, and lets users and captains connect faster. Built for launch-ready demos and investor pitches.</p>
           <div class="cta-row">
-            <button class="btn primary">Start Booking</button>
-            <button class="btn ghost">View Captain Mode</button>
+            <button type="button" class="btn primary" aria-label="Start booking a ride">Start Booking</button>
+            <button type="button" class="btn ghost" aria-label="View captain mode">View Captain Mode</button>
           </div>
           <div class="pill-row">
             <span class="pill">Electric Blue UI</span>
@@ -115,20 +118,25 @@
         <div class="grid two">
           <div class="card shadow glass">
             <h3>Login</h3>
-            <div class="form-col">
-              <input id="userLoginEmail" placeholder="Email or phone" autocomplete="email">
-              <input id="userLoginPassword" placeholder="Password" type="password" autocomplete="current-password">
-              <button class="btn primary" id="userLoginBtn">Login</button>
-            </div>
+            <form class="form-col" id="userLoginForm" novalidate>
+              <label for="userLoginEmail" class="sr-only">Email or phone</label>
+              <input id="userLoginEmail" type="email" placeholder="Email or phone" autocomplete="email" required aria-required="true" aria-label="Email or phone">
+              <label for="userLoginPassword" class="sr-only">Password</label>
+              <input id="userLoginPassword" placeholder="Password" type="password" autocomplete="current-password" required aria-required="true" aria-label="Password" minlength="6">
+              <button type="submit" class="btn primary" id="userLoginBtn">Login</button>
+            </form>
           </div>
           <div class="card shadow glass">
             <h3>Register</h3>
-            <div class="form-col">
-              <input id="userRegisterName" placeholder="Full name" autocomplete="name">
-              <input id="userRegisterEmail" placeholder="Email" autocomplete="email">
-              <input id="userRegisterPhone" placeholder="Mobile number" autocomplete="tel">
-              <button class="btn ghost" id="userRegisterBtn">Create Account</button>
-            </div>
+            <form class="form-col" id="userRegisterForm" novalidate>
+              <label for="userRegisterName" class="sr-only">Full name</label>
+              <input id="userRegisterName" placeholder="Full name" autocomplete="name" required aria-required="true" aria-label="Full name">
+              <label for="userRegisterEmail" class="sr-only">Email</label>
+              <input id="userRegisterEmail" type="email" placeholder="Email" autocomplete="email" required aria-required="true" aria-label="Email">
+              <label for="userRegisterPhone" class="sr-only">Mobile number</label>
+              <input id="userRegisterPhone" type="tel" placeholder="Mobile number" autocomplete="tel" required aria-required="true" aria-label="Mobile number" pattern="[0-9]{10}">
+              <button type="submit" class="btn ghost" id="userRegisterBtn">Create Account</button>
+            </form>
           </div>
         </div>
       </section>
@@ -144,20 +152,25 @@
         <div class="grid two">
           <div class="card shadow glass">
             <h3>Login</h3>
-            <div class="form-col">
-              <input id="captainLoginPhone" placeholder="Phone" autocomplete="tel">
-              <input id="captainLoginOTP" placeholder="OTP" value="1234" autocomplete="one-time-code">
-              <button class="btn primary" id="captainLoginBtn">Login as Captain</button>
-            </div>
+            <form class="form-col" id="captainLoginForm" novalidate>
+              <label for="captainLoginPhone" class="sr-only">Phone</label>
+              <input id="captainLoginPhone" type="tel" placeholder="Phone" autocomplete="tel" required aria-required="true" aria-label="Phone" pattern="[0-9]{10}">
+              <label for="captainLoginOTP" class="sr-only">OTP</label>
+              <input id="captainLoginOTP" type="text" placeholder="OTP" value="1234" autocomplete="one-time-code" required aria-required="true" aria-label="OTP" pattern="[0-9]{4}" maxlength="4">
+              <button type="submit" class="btn primary" id="captainLoginBtn">Login as Captain</button>
+            </form>
           </div>
           <div class="card shadow glass">
             <h3>Register</h3>
-            <div class="form-col">
-              <input id="captainRegisterName" placeholder="Full name" autocomplete="name">
-              <input id="captainRegisterVehicle" placeholder="Vehicle number">
-              <input id="captainRegisterLicense" placeholder="License ID">
-              <button class="btn ghost" id="captainRegisterBtn">Sign Up</button>
-            </div>
+            <form class="form-col" id="captainRegisterForm" novalidate>
+              <label for="captainRegisterName" class="sr-only">Full name</label>
+              <input id="captainRegisterName" placeholder="Full name" autocomplete="name" required aria-required="true" aria-label="Full name">
+              <label for="captainRegisterVehicle" class="sr-only">Vehicle number</label>
+              <input id="captainRegisterVehicle" placeholder="Vehicle number" required aria-required="true" aria-label="Vehicle number">
+              <label for="captainRegisterLicense" class="sr-only">License ID</label>
+              <input id="captainRegisterLicense" placeholder="License ID" required aria-required="true" aria-label="License ID">
+              <button type="submit" class="btn ghost" id="captainRegisterBtn">Sign Up</button>
+            </form>
           </div>
         </div>
       </section>
@@ -178,8 +191,10 @@
         <div class="grid two">
           <div class="card shadow glass map-card">
             <div class="inputs">
-              <input class="pill-input" id="pickupInput" value="Pickup: Auto-detected · MG Road" aria-label="Pickup" placeholder="Enter pickup location">
-              <input class="pill-input" id="destinationInput" value="Destination: Airport T3" aria-label="Destination" placeholder="Enter destination">
+              <label for="pickupInput" class="sr-only">Pickup location</label>
+              <input class="pill-input" id="pickupInput" type="text" value="Pickup: Auto-detected · MG Road" aria-label="Pickup location" placeholder="Enter pickup location" required>
+              <label for="destinationInput" class="sr-only">Destination</label>
+              <input class="pill-input" id="destinationInput" type="text" value="Destination: Airport T3" aria-label="Destination" placeholder="Enter destination" required>
             </div>
             <div class="map large" id="bookingMap">
               <div id="bookingMapContainer" class="map-container"></div>
@@ -204,7 +219,7 @@
               <div><p class="label">ETA</p><h4 id="bs-eta" data-countdown="360">6 min</h4></div>
               <div><p class="label">Driver rating</p><h4>4.8 ★</h4></div>
             </div>
-            <button class="btn primary full" id="bookRideBtn">BOOK RIDE</button>
+            <button type="button" class="btn primary full" id="bookRideBtn" aria-label="Book ride with selected provider">BOOK RIDE</button>
           </div>
         </div>
       </section>

@@ -1,0 +1,35 @@
+{
+  "name": "rydio-aggregator",
+  "version": "1.0.0",
+  "description": "Multi-network ride aggregator comparing Uber, Ola, and Rapido",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "lint": "echo 'Add ESLint/Prettier for linting'",
+    "test": "echo 'Add test framework'"
+  },
+  "keywords": [
+    "ride-aggregator",
+    "uber",
+    "ola",
+    "rapido",
+    "taxi-booking",
+    "transportation"
+  ],
+  "author": "RYDIO Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shruthi2215/Rydio-aggregator.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
+
