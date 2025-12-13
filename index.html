@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Rydio — Ride Smarter</title>
+    <title>Rydio — Ride Smarter (Accessible)</title>
 
-    <meta name="description" content="Rydio is a modern ride aggregator inspired by Uber, Rapido, InDrive, and Bolt. Compare routes, fares, and ETAs with glassmorphic 2025 UI." />
+    <meta name="description" content="Rydio is a modern ride aggregator inspired by Uber, Rapido, InDrive, and Bolt. Compare routes, fares, and ETAs with a senior-friendly accessible UI." />
     <meta name="theme-color" content="#0051FF" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -13,21 +13,282 @@
     <link rel="apple-touch-icon" href="/vite.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Rydio — Ride Smarter" />
-    <meta property="og:description" content="Pick routes, compare fares, and track rides live with a futuristic mobility UI." />
-    <meta property="og:image" content="/vite.svg" />
-    <meta property="og:url" content="https://rydio.app" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2r6+g7b6gE1Q0nxQe7r4n0X5q1wKk3f2Qx3r9mM=" crossorigin="" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Rydio — Ride Smarter" />
-    <meta name="twitter:description" content="Pick routes, compare fares, and track rides live with a futuristic mobility UI." />
-    <meta name="twitter:image" content="/vite.svg" />
+    <!-- Minimal inline styles to demonstrate senior-friendly / high-contrast UI. -->
+    <style>
+      :root{
+        --bg: #071032;
+        --card: rgba(255,255,255,0.04);
+        --text: #F5F7FA;
+        --muted: #C7CDD6;
+        --uber: #000000;
+        --ola: #E53935;
+        --rapido: #D4A017;
+        --accent: #0051FF;
+        --focus: 3px solid rgba(0,81,255,0.25);
+      }
+
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--text);background:linear-gradient(180deg,#031025 0%, var(--bg) 100%);-webkit-font-smoothing:antialiased}
+      body{font-size:18px;line-height:1.4}
+      .container{display:flex;gap:18px;padding:20px;max-width:1200px;margin:0 auto}
+      header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;max-width:1200px;margin:0 auto}
+      .brand{display:flex;align-items:center;gap:12px}
+      .logo{width:56px;height:56px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+      h1{font-size:22px;margin:0}
+      .actions{display:flex;gap:12px;align-items:center}
+      button{background:var(--card);color:var(--text);border:0;padding:12px 16px;border-radius:10px;font-weight:600;cursor:pointer}
+      button:focus{outline:none;box-shadow:var(--focus)}
+      .primary{background:var(--accent);color:white}
+      .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+      .left{width:420px;min-width:320px}
+      .right{flex:1;min-height:560px;display:flex;flex-direction:column;gap:12px}
+      label{display:block;margin-bottom:8px;color:var(--muted);font-weight:600}
+      .input{width:100%;padding:12px;border-radius:10px;border:2px solid rgba(255,255,255,0.03);background:transparent;color:var(--text);font-size:18px}
+      .filters{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+      .service-options{display:flex;gap:10px;align-items:center}
+      .service-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:2px solid rgba(255,255,255,0.03);cursor:pointer}
+      .service-swatch{width:18px;height:18px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.5)}
+      .service-btn[aria-pressed="true"]{box-shadow:0 8px 24px rgba(0,0,0,0.5);transform:translateY(-2px)}
+      .map{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;display:flex;flex-direction:column;padding:12px;min-height:560px}
+      .map-canvas{flex:1;border-radius:10px;background:linear-gradient(180deg,#042339,#07304b);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+      .hint{color:var(--muted);font-size:15px}
+      .route-card{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px}
+      .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);font-weight:600}
+      .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+      .small{font-size:14px;color:var(--muted)}
+      .big{font-size:20px}
+      /* Leaflet map must have explicit height */
+      #leaflet-map { width: 100%; height: 420px; border-radius:10px; }
+      /* Responsive */
+      @media (max-width:980px){
+        .container{flex-direction:column;padding:12px}
+        .left{width:auto;min-width:unset}
+      }
+    </style>
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+  <body>
+    <header>
+      <div class="brand" aria-hidden="false">
+        <div class="logo" aria-hidden="true">R</div>
+        <div>
+          <h1>Rydio — Ride Smarter</h1>
+          <div class="small">Compare Ola, Uber, Rapido in one path — pick the color to highlight</div>
+        </div>
+      </div>
+
+      <div class="actions" role="navigation" aria-label="Top actions">
+        <button id="open-user-login" aria-haspopup="dialog">User Login</button>
+        <button id="open-driver-login" aria-haspopup="dialog">Captain Login</button>
+        <button class="primary" id="book-now">Book</button>
+      </div>
+    </header>
+
+    <main class="container" role="main">
+      <!-- LEFT: controls / filters -->
+      <aside class="left panel" aria-labelledby="controls-heading">
+        <h2 id="controls-heading" class="big">Trip planner</h2>
+
+        <div>
+          <label for="from">From</label>
+          <input id="from" class="input" placeholder="Pickup location (tap map or type)" aria-label="Pickup location">
+        </div>
+        <div style="margin-top:12px">
+          <label for="to">To</label>
+          <input id="to" class="input" placeholder="Destination" aria-label="Destination">
+        </div>
+
+        <div class="filters" aria-hidden="false" style="margin-top:12px">
+          <div><label>Highlight provider</label>
+            <div class="service-options" role="tablist" aria-label="Providers">
+              <button class="service-btn" data-provider="uber" aria-pressed="true" role="tab" title="Uber — black">
+                <span class="service-swatch" style="background:var(--uber)"></span><span class="small">Uber</span>
+              </button>
+              <button class="service-btn" data-provider="ola" aria-pressed="false" role="tab" title="Ola — red">
+                <span class="service-swatch" style="background:var(--ola)"></span><span class="small">Ola</span>
+              </button>
+              <button class="service-btn" data-provider="rapido" aria-pressed="false" role="tab" title="Rapido — mustard">
+                <span class="service-swatch" style="background:var(--rapido)"></span><span class="small">Rapido</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Sort & Filters</label>
+            <div class="controls">
+              <select id="sort" class="input" style="width:170px" aria-label="Sort rides">
+                <option value="best">Best match</option>
+                <option value="price">Lowest price</option>
+                <option value="eta">Shortest ETA</option>
+                <option value="rating">Highest driver rating</option>
+              </select>
+
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="checkbox" id="women-safety" aria-checked="false">
+                <label for="women-safety" class="small">Women-only preferred</label>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="checkbox" id="senior-friendly" aria-checked="true" checked>
+                <label for="senior-friendly" class="small">Senior-friendly options</label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Payment</label>
+            <div class="controls">
+              <div class="chip" id="upi-chip">UPI (preferred)</div>
+              <div class="chip">Card</div>
+              <div class="chip">Wallet</div>
+            </div>
+            <div class="small" style="margin-top:6px">UPI deep-linking or provider SDKs (Razorpay/Google Pay) can be integrated server-side.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="route-card panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="small">Selected route</div>
+                <div class="big" id="trip-label">Single path — comparing providers</div>
+              </div>
+              <div class="small" id="trip-time">Est. 18–24 min</div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+              <div class="chip" id="price-chip">Price: ₹ 180 — ₹ 310</div>
+              <div class="chip" id="driver-chip">Driver avg: 4.7★</div>
+              <div class="chip" id="eta-chip">ETA: 18m</div>
+            </div>
+
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button id="select-uber" class="service-btn" data-provider="uber">Choose Uber</button>
+              <button id="select-ola" class="service-btn" data-provider="ola">Choose Ola</button>
+              <button id="select-rapido" class="service-btn" data-provider="rapido">Choose Rapido</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: map + overlays -->
+      <section class="right">
+        <div class="map panel" aria-label="Map and route preview">
+          <div class="map-canvas" id="map" role="application" aria-label="Map">
+            <!-- Leaflet map container -->
+            <div id="leaflet-map" aria-hidden="false"></div>
+            <div style="position:relative;z-index:2;text-align:center;margin-top:8px">
+              <div class="hint">Map loaded — click a provider to highlight its color on the single shared path</div>
+            </div>
+          </div>
+
+          <!-- bottom controls -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div class="small">Tap route to view provider details • Three collapsed overlays show provider fare & ETA</div>
+            <div style="display:flex;gap:8px">
+              <button id="show-split" aria-expanded="false">Show provider breakdown</button>
+              <button id="confirm" class="primary">Confirm & Pay</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- provider breakdown (collapsed by default) -->
+        <div id="providers" class="panel" style="display:none;margin-top:12px">
+          <h3 class="big">Providers</h3>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
+            <li class="panel" data-provider="uber" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="display:flex;gap:8px;align-items:center"><span class="service-swatch" style="background:var(--uber)"></span><strong>Uber</strong> <span class="small" id="uber-rating">• 4.8★</span></div>
+                <div class="small" id="uber-meta">Price ₹ 310 • ETA 18m</div>
+              </div>
+              <div><button class="primary provider-book" data-provider="uber">Book Uber</button></div>
+            </li>
+
+            <li class="panel" data-provider="ola" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="display:flex;gap:8px;align-items:center"><span class="service-swatch" style="background:var(--ola)"></span><strong>Ola</strong> <span class="small" id="ola-rating">• 4.6★</span></div>
+                <div class="small" id="ola-meta">Price ₹ 260 • ETA 20m</div>
+              </div>
+              <div><button class="primary provider-book" data-provider="ola">Book Ola</button></div>
+            </li>
+
+            <li class="panel" data-provider="rapido" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="display:flex;gap:8px;align-items:center"><span class="service-swatch" style="background:var(--rapido)"></span><strong>Rapido</strong> <span class="small" id="rapido-rating">• 4.4★</span></div>
+                <div class="small" id="rapido-meta">Price ₹ 180 • ETA 22m</div>
+              </div>
+              <div><button class="primary provider-book" data-provider="rapido">Book Rapido</button></div>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Simple modal skeletons for login forms (accessible) -->
+    <div id="modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;padding:20px" role="presentation">
+      <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" class="panel" style="max-width:520px;width:100%">
+        <h2 id="modal-title">Login</h2>
+        <form id="login-form" style="display:flex;flex-direction:column;gap:12px">
+          <label for="phone">Phone number</label>
+          <input id="phone" class="input" placeholder="e.g. +91 98XXXXXXX" inputmode="tel">
+
+          <label for="password">Password (or OTP)</label>
+          <input id="password" class="input" placeholder="OTP or password">
+
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button type="button" id="close-modal">Cancel</button>
+            <button type="submit" class="primary">Sign in</button>
+          </div>
+        </form>
+        <div class="small" style="margin-top:8px">We recommend OTP-based login for senior users for simplicity.</div>
+      </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j8b+3tq6Gf3sYkGQKk9n0b1w2p1vA9u3b9+Yk6M=" crossorigin=""></script>
+
+    <!-- Scripts: map integration module -->
+    <script type="module" src="/src/leaflet-init.js"></script>
+
+    <!-- Remaining UI script: modal, provider toggles & basic behaviors -->
+    <script>
+      // keep small UI behaviors for modal and provider list toggling (map interactions are in leaflet-init.js)
+      (function(){
+        const showSplitBtn = document.getElementById('show-split');
+        const providersEl = document.getElementById('providers');
+        showSplitBtn.addEventListener('click', () => {
+          const expanded = showSplitBtn.getAttribute('aria-expanded') === 'true';
+          showSplitBtn.setAttribute('aria-expanded', String(!expanded));
+          providersEl.style.display = expanded ? 'none' : 'block';
+        });
+
+        // Modal controls
+        const backdrop = document.getElementById('modal-backdrop');
+        document.getElementById('open-user-login').addEventListener('click', () => { backdrop.style.display = 'flex'; document.getElementById('modal-title').innerText = 'User login'; document.getElementById('phone').focus(); });
+        document.getElementById('open-driver-login').addEventListener('click', () => { backdrop.style.display = 'flex'; document.getElementById('modal-title').innerText = 'Captain login'; document.getElementById('phone').focus(); });
+        document.getElementById('close-modal').addEventListener('click', () => backdrop.style.display = 'none');
+        backdrop.addEventListener('click', (ev) => { if(ev.target === backdrop) backdrop.style.display = 'none'; });
+        document.getElementById('login-form').addEventListener('submit', (ev) => { ev.preventDefault(); alert('Login submitted — integrate authentication (e.g., Firebase Auth or your backend).'); backdrop.style.display = 'none'; });
+
+        // provider book buttons: simple mock
+        document.querySelectorAll('.provider-book').forEach(btn => {
+          btn.addEventListener('click', (e) => { const p = btn.dataset.provider; alert('Mock booking for ' + p + '. Integrate booking & payment flow.'); });
+        });
+
+        // Left provider buttons highlight are wired in map module, but we keep click -> dispatch
+        document.querySelectorAll('.service-btn[data-provider]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const provider = btn.dataset.provider;
+            // allow leaflet-init.js to listen for this custom event
+            window.dispatchEvent(new CustomEvent('rydio:select-provider', { detail: { provider } }));
+          });
+        });
+      })();
+    </script>
+
+    <!-- Implementation notes: Replace the mock coordinates and fare data with real provider APIs and secure server-side integrations. -->
   </body>
 </html>
